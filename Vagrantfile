@@ -2,13 +2,14 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "bento/ubuntu-20.04" # 20.04 LTS
+  config.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
   config.vm.provider "virtualbox" do |vb|
-        vb.memory = "1516"
+        vb.memory = "1042"
+        vb.cpus = "1"
   end
 
   # 3-node configuration - Region A
-  (1..5).each do |i|
+  (1..3).each do |i|
     config.vm.define "nomad-a-#{i}" do |n|
       n.vm.provision "shell", path: "node-install-a.sh"
       if i == 1
@@ -20,16 +21,4 @@ Vagrant.configure(2) do |config|
     end
   end
 
-  # 3-node configuration - Region B
-  (1..5).each do |i|
-    config.vm.define "nomad-b-#{i}" do |n|
-      n.vm.provision "shell", path: "node-install-b.sh"
-      if i == 1
-        # Expose the nomad ports
-        n.vm.network "forwarded_port", guest: 4646, host: 4646, auto_correct: true
-      end
-      n.vm.hostname = "nomad-b-#{i}"
-      n.vm.network "private_network", ip: "172.16.1.#{i+200}"
-    end
-  end
 end
