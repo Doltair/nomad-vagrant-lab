@@ -1,5 +1,9 @@
 data_dir = "/tmp/nomad/server"
 
+acl {
+  enabled = false
+}
+
 server {
   enabled          = true
   bootstrap_expect = 3
