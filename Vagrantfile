@@ -7,16 +7,19 @@ $num_instances = 3
 
 Vagrant.configure(2) do |config|
   config.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
-  config.vm.provider "virtualbox" do |vb|
-        vb.memory = "1042"
-        vb.cpus = "2"
-        vb.customize ["modifyvm", :id, "--ioapic", "off"]
-  end
 
   # 3-node configuration - Region A
   (1..$num_instances).each do |i|
     config.vm.define "nomad-a-#{i}" do |n|
+      n.vm.provider "virtualbox" do |vb|
+        vb.memory = "1042"
+        vb.cpus = "2"
+        vb.customize ["modifyvm", :id, "--ioapic", "off"]
+      end
       n.vm.provision "shell", path: "node-install-a.sh"
+      n.vm.provision "shell", inline: <<-SHELL
+      mkdir -p /opt/mysql/data
+      SHELL
       n.vm.provision "shell", inline: <<-SHELL
       /vagrant/launch-a-#{i}.sh
       SHELL
@@ -29,12 +32,17 @@ Vagrant.configure(2) do |config|
     end
   end
 
-  config.vm.define "haproxy-nomad" do |haproxy|
-    haproxy.vm.box = $box_name
-    haproxy.vm.box_url = $box_url
-    haproxy.vm.network "private_network", ip: "172.16.1.10"
+  config.vm.define "haproxy-nomad" do |haproxy_nomad|
+    haproxy_nomad.vm.box = $box_name
+    haproxy_nomad.vm.box_url = $box_url
+    haproxy_nomad.vm.network "private_network", ip: "172.16.1.10"
+    haproxy_nomad.vm.provider "virtualbox" do |vb|
+      vb.memory = "256"
+      vb.cpus = "1"
+      vb.customize ["modifyvm", :id, "--ioapic", "off"]
+    end
 
-    haproxy.vm.provision "shell", inline: <<-SHELL
+    haproxy_nomad.vm.provision "shell", inline: <<-SHELL
       systemctl disable firewalld.service
       systemctl stop firewalld.service
       yum -y install haproxy
@@ -42,27 +50,32 @@ Vagrant.configure(2) do |config|
       systemctl enable haproxy.service
     SHELL
 
-    haproxy.vm.provision "file", source: "haproxy_nomad.cfg", destination: "~/haproxy.cfg"
+    haproxy_nomad.vm.provision "file", source: "haproxy_nomad.cfg", destination: "~/haproxy.cfg"
 
     (1..$num_instances).each do |i|
       ip = "172.16.1.#{i+100}"
-      haproxy.vm.provision "shell", inline: <<-SHELL
+      haproxy_nomad.vm.provision "shell", inline: <<-SHELL
         echo "    server  nomad#{i} #{ip}:4646 check" >> /home/vagrant/haproxy.cfg
       SHELL
     end
 
-    haproxy.vm.provision "shell", inline: <<-SHELL
+    haproxy_nomad.vm.provision "shell", inline: <<-SHELL
       mv /home/vagrant/haproxy.cfg /etc/haproxy/
       systemctl start haproxy.service
     SHELL
   end
 
-  config.vm.define "haproxy-consul" do |haproxy|
-    haproxy.vm.box = $box_name
-    haproxy.vm.box_url = $box_url
-    haproxy.vm.network "private_network", ip: "172.16.1.11"
+  config.vm.define "haproxy-consul" do |haproxy_consul|
+    haproxy_consul.vm.box = $box_name
+    haproxy_consul.vm.box_url = $box_url
+    haproxy_consul.vm.network "private_network", ip: "172.16.1.11"
+    haproxy_consul.vm.provider "virtualbox" do |vb|
+      vb.memory = "256"
+      vb.cpus = "1"
+      vb.customize ["modifyvm", :id, "--ioapic", "off"]
+    end
 
-    haproxy.vm.provision "shell", inline: <<-SHELL
+    haproxy_consul.vm.provision "shell", inline: <<-SHELL
       systemctl disable firewalld.service
       systemctl stop firewalld.service
       yum -y install haproxy
@@ -70,16 +83,16 @@ Vagrant.configure(2) do |config|
       systemctl enable haproxy.service
     SHELL
 
-    haproxy.vm.provision "file", source: "haproxy_consul.cfg", destination: "~/haproxy.cfg"
+    haproxy_consul.vm.provision "file", source: "haproxy_consul.cfg", destination: "~/haproxy.cfg"
 
     (1..$num_instances).each do |i|
       ip = "172.16.1.#{i+100}"
-      haproxy.vm.provision "shell", inline: <<-SHELL
+      haproxy_consul.vm.provision "shell", inline: <<-SHELL
         echo "    server  consul#{i} #{ip}:8500 check" >> /home/vagrant/haproxy.cfg
       SHELL
     end
 
-    haproxy.vm.provision "shell", inline: <<-SHELL
+    haproxy_consul.vm.provision "shell", inline: <<-SHELL
       mv /home/vagrant/haproxy.cfg /etc/haproxy/
       systemctl start haproxy.service
     SHELL
