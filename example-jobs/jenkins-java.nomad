@@ -15,12 +15,11 @@ job "jenkins" {
        sticky  = true
        
      }
+    task "frontend" {
       env {
         # Use ephemeral storage for Jenkins data.
         JENKINS_HOME = "/alloc/data"
-        #JENKINS_SLAVE_AGENT_PORT = 5050
       }
-
       driver = "java"
       config {
         jar_path    = "local/jenkins.war"
@@ -52,9 +51,6 @@ job "jenkins" {
             port "http" {
                 static = 8080
             }
-          #  port "slave" {
-          #    static = 5050
-          #  }
           }
         }
       }
