@@ -28,6 +28,10 @@ job "jenkins" {
       }
       artifact {
         source = "https://get.jenkins.io/war-stable/2.332.3/jenkins.war"
+        options {
+          # Checksum will change depending on the Jenkins Version.
+          checksum = "sha256:d193f179aadf3a7ceb61adebc3ab51218ac4a7852b88932ff33b44fd7be6010f"
+        }
       }
       service {
         # This tells Consul to monitor the service on the port
