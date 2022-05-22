@@ -7,6 +7,11 @@ if [ ! -d /tmp/archive ]; then
   sudo mkdir /tmp/archive/
 fi
 
+# OpenJDK 11
+sudo add-apt-repository ppa:openjdk-r/ppa
+sudo apt-get update -y
+sudo apt install openjdk-11-jdk -y
+
 # Install Docker Community Edition
 echo "Docker Install Beginning..."
 sudo apt-get remove docker docker-engine docker.io
@@ -26,7 +31,7 @@ sudo docker --version
 
 echo "Nomad Install Beginning..."
 # For now we use a static version. Set to the latest tested version you want here.
-NOMAD_VERSION=1.2.6
+NOMAD_VERSION=1.3.1
 cd /tmp/
 sudo curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o nomad.zip
 if [ ! -d nomad ]; then
