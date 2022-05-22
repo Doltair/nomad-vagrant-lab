@@ -1,13 +1,14 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# $box_name = "bento/rockylinux-8.4"
 $box_name = "bento/centos-7"
 # $box_url = ""
-$box_url = "bento/rockylinux-8.4"
+# $box_url = "bento/rockylinux-8.4"
 $num_instances = 3
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "bento/ubuntu-16.04" # 16.04 LTS
+  config.vm.box = "bento/ubuntu-21.10" # 16.04 LTS
 
   # 3-node configuration - Region A
   (1..$num_instances).each do |i|
@@ -19,15 +20,15 @@ Vagrant.configure(2) do |config|
       end
       n.vm.provision "shell", path: "node-install-a.sh"
       n.vm.provision "shell", inline: <<-SHELL
-      mkdir -p /opt/mysql/data
+      mkdir -p /opt/shared
       SHELL
       n.vm.provision "shell", inline: <<-SHELL
       /vagrant/launch-a-#{i}.sh
       SHELL
-      if i == 1
+     # if i == 1
         # Expose the nomad ports
-        n.vm.network "forwarded_port", guest: 4646, host: 4646, auto_correct: true
-      end
+     #   n.vm.network "forwarded_port", guest: 4646, host: 4646, auto_correct: true
+     # end
       n.vm.hostname = "nomad-a-#{i}"
       n.vm.network "private_network", ip: "172.16.1.#{i+100}"
     end
@@ -46,6 +47,7 @@ Vagrant.configure(2) do |config|
     haproxy_nomad.vm.provision "shell", inline: <<-SHELL
       systemctl disable firewalld.service
       systemctl stop firewalld.service
+      yum update -y
       yum -y install haproxy
       mv /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.org
       systemctl enable haproxy.service
