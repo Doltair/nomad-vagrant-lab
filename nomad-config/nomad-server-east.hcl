@@ -26,6 +26,14 @@ plugin "raw_exec" {
   }
 }
 
+plugin "docker" {
+  config {
+    volumes {
+      enabled = true
+    }
+  }
+}
+
 client {
   enabled           = true
   network_interface = "eth1"
