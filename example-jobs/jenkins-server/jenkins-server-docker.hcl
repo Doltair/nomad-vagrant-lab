@@ -1,6 +1,15 @@
 job "jenkins-docker-server" {
   type        = "service"
   datacenters = ["toronto"]
+  update {
+      stagger      = "30s"
+      max_parallel = 1
+      health_check     = "checks"
+      min_healthy_time = "10s"
+      healthy_deadline = "5m"
+      auto_revert      = false
+      canary           = 0
+    }
 
   group "jenkins-server" {
     count = 1
@@ -24,6 +33,9 @@ job "jenkins-docker-server" {
 
       config {
         image = "jenkins/jenkins:lts"
+        volumes = [
+            "/var/run/docker.sock:/var/run/docker.sock"
+        ]
 
         port_map = {
           http_ui = 8080
@@ -32,8 +44,8 @@ job "jenkins-docker-server" {
       }
 
       resources {
-        memory = 512
-        cpu    = 750
+        memory = 768
+        cpu    = 2400
         network {
           mbits = 100
           port "http_ui" {

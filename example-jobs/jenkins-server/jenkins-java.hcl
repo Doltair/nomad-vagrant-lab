@@ -30,7 +30,7 @@ job "jenkins" {
       config {
         jar_path    = "local/jenkins.war"
         jvm_options = ["-Xmx768m", "-Xms384m"]
-        args        = ["--httpPort=8080"]
+        args        = ["--httpPort=8888"]
       }
       artifact {
         source = "https://get.jenkins.io/war-stable/2.332.3/jenkins.war"
@@ -59,7 +59,7 @@ job "jenkins" {
           network {
             mbits = 100
             port "http" {
-                static = 8080
+                static = 8888
             }
           }
         }
