@@ -1,6 +1,6 @@
 job "docker-registry" {
   datacenters = ["toronto"]
-  type = "service"
+  type        = "service"
   group "server" {
     count = 1
 
@@ -12,7 +12,7 @@ job "docker-registry" {
 
     network {
       port "http" {
-        to = 5000
+        to     = 5000
         static = 5000
       }
     }
@@ -21,7 +21,7 @@ job "docker-registry" {
       driver = "docker"
 
       volume_mount {
-        volume = "shared"
+        volume      = "shared"
         destination = "/var/lib/registry"
       }
 
@@ -37,7 +37,7 @@ job "docker-registry" {
         memory = 256
         cpu    = 250
         network {
-            mbits = 100
+          mbits = 100
         }
       }
     }

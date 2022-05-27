@@ -28,6 +28,7 @@ sudo service docker restart
 # Configure Docker to be run as the vagrant user
 sudo usermod -aG docker vagrant
 sudo docker --version
+sudo chmod 666 /var/run/docker.sock
 
 echo "Nomad Install Beginning..."
 # For now we use a static version. Set to the latest tested version you want here.
