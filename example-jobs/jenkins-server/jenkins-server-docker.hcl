@@ -2,14 +2,14 @@ job "jenkins-docker-server" {
   type        = "service"
   datacenters = ["toronto"]
   update {
-      stagger      = "30s"
-      max_parallel = 1
-      health_check     = "checks"
-      min_healthy_time = "10s"
-      healthy_deadline = "5m"
-      auto_revert      = false
-      canary           = 0
-    }
+    stagger          = "30s"
+    max_parallel     = 1
+    health_check     = "checks"
+    min_healthy_time = "10s"
+    healthy_deadline = "5m"
+    auto_revert      = false
+    canary           = 0
+  }
 
   group "jenkins-server" {
     count = 1
@@ -21,20 +21,20 @@ job "jenkins-docker-server" {
     }
 
     task "frontend" {
+      driver = "docker"
+
       volume_mount {
         volume      = "shared"
         destination = "/var/jenkins/home"
-      }
 
+      }
       env {
         JENKINS_HOME = "/var/jenkins_home"
       }
-      driver = "docker"
-
       config {
         image = "jenkins/jenkins:lts"
         volumes = [
-            "/var/run/docker.sock:/var/run/docker.sock"
+          "/var/run/docker.sock:/var/run/docker.sock"
         ]
 
         port_map = {
