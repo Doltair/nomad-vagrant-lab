@@ -30,7 +30,10 @@ plugin "docker" {
   config {
     volumes {
       enabled = true
+    #  selinuxlabel = "z"
     }
+    allow_privileged = true
+   # allow_caps       = ["chown", "net_raw"]
   }
 }
 
@@ -38,8 +41,12 @@ client {
   enabled           = true
   network_interface = "eth1"
   servers           = ["172.16.1.101", "172.16.1.102", "172.16.1.103"]
-   host_volume "shared" {
-    path      = "/opt/shared"
+   host_volume "jenkins_home" {
+    path      = "/opt/shared/jenkins_home"
+    read_only = false
+  }
+  host_volume "mysql_data" {
+    path      = "/opt/shared/mysql-data"
     read_only = false
   }
 }

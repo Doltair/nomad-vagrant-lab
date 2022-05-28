@@ -14,29 +14,34 @@ job "jenkins-docker-server" {
   group "jenkins-server" {
     count = 1
 
-    volume "shared" {
+    volume "jenkins_home" {
       type      = "host"
       read_only = false
-      source    = "shared"
+      source    = "jenkins_home"
     }
 
-    task "frontend" {
+    restart {
+      attempts = 10
+      interval = "5m"
+      delay    = "25s"
+      mode     = "delay"
+    }
+
+
+    task "jenkins" {
       driver = "docker"
 
       volume_mount {
-        volume      = "shared"
-        destination = "/var/jenkins/home"
+        volume      = "jenkins_home"
+        destination = "/var/jenkins_home"
+        read_only   = false
+      }
 
-      }
-      env {
-        JENKINS_HOME = "/var/jenkins_home"
-      }
       config {
         image = "jenkins/jenkins:lts"
         volumes = [
-          "/var/run/docker.sock:/var/run/docker.sock"
+            "/var/run/docker.sock:/var/run/docker.sock"
         ]
-
         port_map = {
           http_ui = 8080
           agents  = 50000

@@ -8,9 +8,9 @@ if [ ! -d /tmp/archive ]; then
 fi
 
 # OpenJDK 11
-sudo add-apt-repository ppa:openjdk-r/ppa
-sudo apt-get update -y
-sudo apt install openjdk-11-jdk -y
+# sudo add-apt-repository ppa:openjdk-r/ppa
+# sudo apt-get update -y
+# sudo apt install openjdk-11-jdk -y
 
 # Install Docker Community Edition
 echo "Docker Install Beginning..."

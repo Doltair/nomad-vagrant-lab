@@ -8,7 +8,7 @@ $box_name = "bento/centos-7"
 $num_instances = 3
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "bento/ubuntu-21.10" # 16.04 LTS
+  config.vm.box = "bento/ubuntu-16.04" # 16.04 LTS / 21.10
 
   # 3-node configuration - Region A
   (1..$num_instances).each do |i|
@@ -20,7 +20,8 @@ Vagrant.configure(2) do |config|
       end
       n.vm.provision "shell", path: "node-install-a.sh"
       n.vm.provision "shell", inline: <<-SHELL
-      mkdir -p /opt/shared
+      mkdir -p /opt/shared/mysql-data && chown vagrant:vagrant /opt/shared/mysql-data
+      mkdir -p /opt/shared/jenkins_home && chown vagrant:vagrant /opt/shared/jenkins_home
       SHELL
       n.vm.provision "shell", inline: <<-SHELL
       /vagrant/launch-a-#{i}.sh
