@@ -5,7 +5,7 @@ job "mysql-server" {
   group "mysql-server" {
     count = 1
 
-    volume "shared" {
+    volume "mysql" {
       type      = "host"
       read_only = false
       source    = "shared"
@@ -22,7 +22,7 @@ job "mysql-server" {
       driver = "docker"
 
       volume_mount {
-        volume      = "shared"
+        volume      = "mysql"
         destination = "/var/lib/mysql"
         read_only   = false
       }
@@ -39,7 +39,7 @@ job "mysql-server" {
 
       resources {
         cpu    = 500
-        memory = 512
+        memory = 1024
       }
 
       service {
