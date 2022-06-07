@@ -20,6 +20,11 @@ job "jenkins-docker-server" {
       source    = "jenkins_home"
     }
 
+    network {
+      port "http_ui" { static = 8080 }
+      port "agents" { static = 50000 }
+    }
+
     restart {
       attempts = 10
       interval = "5m"
@@ -40,25 +45,20 @@ job "jenkins-docker-server" {
       config {
         image = "jenkins/jenkins:lts"
         volumes = [
-            "/var/run/docker.sock:/var/run/docker.sock"
+          "/var/run/docker.sock:/var/run/docker.sock"
         ]
-        port_map = {
-          http_ui = 8080
-          agents  = 50000
-        }
+        ports = [
+          "http_ui",
+          "agents"
+        ]
       }
+
 
       resources {
         memory = 768
         cpu    = 2400
         network {
           mbits = 100
-          port "http_ui" {
-            static = 8888
-          }
-          port "agents" {
-            static = 50001
-          }
         }
       }
     }
